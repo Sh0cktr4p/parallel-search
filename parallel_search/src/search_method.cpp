@@ -1,14 +1,14 @@
 #include "search_method.h"
 
 
-SearchMethod::SearchMethod(std::vector<std::string>& data): data{data} {}
+SearchMethod::SearchMethod(const std::vector<std::string>& data): data{data} {}
 
-LinearSearchMethod::LinearSearchMethod(std::vector<std::string>& data): SearchMethod{data} {}
+LinearSearchMethod::LinearSearchMethod(const std::vector<std::string>& data): SearchMethod{data} {}
 
-std::vector<std::string> LinearSearchMethod::search(std::string &keyword) {
+std::vector<std::string> LinearSearchMethod::search(const std::string &keyword) {
     std::vector<std::string> results;
 
-    for (std::string &element : this->data) {
+    for (const std::string &element : this->data) {
         if(element.rfind(keyword, 0) == 0) {
             results.push_back(element);
         }
@@ -17,10 +17,10 @@ std::vector<std::string> LinearSearchMethod::search(std::string &keyword) {
     return results;
 }
 
-TreeSearchMethod::TreeSearchMethod(std::vector<std::string>& data): SearchMethod(data), tree() {
+TreeSearchMethod::TreeSearchMethod(const std::vector<std::string>& data): SearchMethod(data), tree() {
     this->tree.addElements(this->data);
 }
 
-std::vector<std::string> TreeSearchMethod::search(std::string &keyword) {
+std::vector<std::string> TreeSearchMethod::search(const std::string &keyword) {
     return this->tree.find(keyword);
 }

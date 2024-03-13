@@ -3,14 +3,14 @@
 #ifndef SKIP_DIS_SHIT
 SearchTreeNode::SearchTreeNode(size_t depth): depth{depth}, item{}, character_map{} {}
 
-SearchTreeNode::SearchTreeNode(size_t depth, std::string &item): depth{depth}, item{item}, character_map{} {}
+SearchTreeNode::SearchTreeNode(size_t depth, const std::string &item): depth{depth}, item{item}, character_map{} {}
 
 bool SearchTreeNode::isLeaf() {
     // Inner node may also have items (if depth == length)
     return !this->character_map.has_value();
 }
 
-SearchTreeNode *SearchTreeNode::getChild(std::string &s) {
+SearchTreeNode *SearchTreeNode::getChild(const std::string &s) {
     if (s.length() <= this->depth || !this->character_map.has_value()) {
         return nullptr;
     }
@@ -25,7 +25,7 @@ SearchTreeNode *SearchTreeNode::getChild(std::string &s) {
     }
 }
 
-SearchTreeNode* SearchTreeNode::getMatchingSubtree(std::string &s) {
+SearchTreeNode* SearchTreeNode::getMatchingSubtree(const std::string &s) {
     if (s.length() == this->depth) {
         return this;
     }
@@ -40,7 +40,7 @@ SearchTreeNode* SearchTreeNode::getMatchingSubtree(std::string &s) {
     }
 }
 
-void SearchTreeNode::addString(std::string &s) {
+void SearchTreeNode::addString(const std::string &s) {
     if (this->item.has_value() && this->item.value() == s) {
         // Do nothing when storing an already stored string
         return;
@@ -86,7 +86,7 @@ std::vector<std::string> SearchTreeNode::getAllItems() {
     return result;
 }
 
-std::optional<std::vector<std::string>> SearchTreeNode::find(std::string &s) {
+std::optional<std::vector<std::string>> SearchTreeNode::find(const std::string &s) {
     SearchTreeNode* subtree = this->getMatchingSubtree(s);
 
     if (subtree == nullptr) {
@@ -99,17 +99,17 @@ std::optional<std::vector<std::string>> SearchTreeNode::find(std::string &s) {
 
 SearchTree::SearchTree(): root(0) {}
 
-void SearchTree::addString(std::string &element) {
+void SearchTree::addString(const std::string &element) {
     this->root.addString(element);
 }
 
-void SearchTree::addElements(std::vector<std::string> &elements) {
-    for (std::string &element : elements) {
+void SearchTree::addElements(const std::vector<std::string> &elements) {
+    for (const std::string &element : elements) {
         this->addString(element);
     }
 }
 
-std::vector<std::string> SearchTree::find(std::string &s) {
+std::vector<std::string> SearchTree::find(const std::string &s) {
     return this->root.find(s).value_or(std::vector<std::string>{});
 }
 #endif

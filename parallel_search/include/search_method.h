@@ -8,20 +8,20 @@
 
 class SearchMethod {
     protected:
-        std::vector<std::string>& data;
+        const std::vector<std::string>& data;
 
     public:
-        SearchMethod(std::vector<std::string>& data);
+        SearchMethod(const std::vector<std::string>& data);
 
-        virtual std::vector<std::string> search(std::string &keyword) = 0;
+        virtual std::vector<std::string> search(const std::string &keyword) = 0;
 };
 
 
 class LinearSearchMethod: SearchMethod {
     public:
-        LinearSearchMethod(std::vector<std::string>& data);
+        LinearSearchMethod(const std::vector<std::string>& data);
 
-        std::vector<std::string> search(std::string &keyword);
+        std::vector<std::string> search(const std::string &keyword) override;
 };
 
 
@@ -30,7 +30,7 @@ class TreeSearchMethod: SearchMethod {
         SearchTree tree;
     
     public:
-        TreeSearchMethod(std::vector<std::string>& data);
+        TreeSearchMethod(const std::vector<std::string>& data);
 
-        std::vector<std::string> search(std::string &keyword);
+        std::vector<std::string> search(const std::string &keyword) override;
 };

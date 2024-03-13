@@ -74,7 +74,11 @@ std::vector<std::string> getRandomLengthExampleInput(
     vec.reserve(numElements);
 
     for (unsigned int i = 0; i < numElements; i++) {
-        vec.push_back(getRandomString(minLength + (rand() % (maxLength - minLength)), charSet));
+        unsigned int elementLength{minLength};
+        if (maxLength > minLength) {
+            elementLength += rand() % (maxLength - minLength);
+        }
+        vec.push_back(getRandomString(elementLength, charSet));
     }
 
     return vec;

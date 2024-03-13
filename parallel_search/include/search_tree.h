@@ -14,19 +14,19 @@ class SearchTreeNode {
         std::optional<std::string> item;
         std::optional<std::unordered_map<char, std::unique_ptr<SearchTreeNode>>> character_map;
 
-        SearchTreeNode* getChild(std::string& s);
-        SearchTreeNode* getMatchingSubtree(std::string& s);
+        SearchTreeNode* getChild(const std::string& s);
+        SearchTreeNode* getMatchingSubtree(const std::string& s);
     public:
         SearchTreeNode(size_t depth);
-        SearchTreeNode(size_t depth, std::string& item);
+        SearchTreeNode(size_t depth, const std::string& item);
 
         bool isLeaf();
         // If a subnode already exists for the given character, return it
         // Otherwise, create a new node
-        void addString(std::string &s);
+        void addString(const std::string &s);
 
         std::vector<std::string> getAllItems();
-        std::optional<std::vector<std::string>> find(std::string &s);
+        std::optional<std::vector<std::string>> find(const std::string &s);
 };
 
 class SearchTree {
@@ -35,9 +35,9 @@ class SearchTree {
     
     public:
         SearchTree();
-        void addString(std::string &element);
-        void addElements(std::vector<std::string> &elements);
+        void addString(const std::string &element);
+        void addElements(const std::vector<std::string> &elements);
 
-        std::vector<std::string> find(std::string &s);
+        std::vector<std::string> find(const std::string &s);
 };
 #endif
