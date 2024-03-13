@@ -8,8 +8,10 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/external/googletest/googletest/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/external/googletest/googletest/
 )
+target_link_libraries(tests ${PROJECT_NAME}_lib)
 
-target_sources(tests PRIVATE hello_test.cpp)
+file(GLOB TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/tests/*.cpp)
+target_sources(tests PRIVATE ${TEST_SRC_FILES})
 target_link_libraries(tests gtest gtest_main)
 
 gtest_discover_tests(tests)
