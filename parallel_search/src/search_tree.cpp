@@ -1,7 +1,5 @@
 #include "search_tree.h"
 
-#ifndef SKIP_DIS_SHIT
-
 char SearchTreeNode::getKeyChar(const std::string &s) {
     return s[this->depth];
 }
@@ -224,4 +222,3 @@ void SearchTree::addElements(const std::vector<std::string> &elements, size_t nT
 std::vector<std::string> SearchTree::find(const std::string &s, size_t nThreads) {
     return this->root.find(s, nThreads).value_or(std::vector<std::string>{});
 }
-#endif

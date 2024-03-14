@@ -2,10 +2,10 @@
 #include "example_inputs.h"
 #include "search_method.h"
 
-
 struct TreeSearchMethodArgs {
     std::vector<std::string> inputData;
     std::string searchString;
+    size_t nThreads = 4;
 };
 
 class TestTreeSearchMethod : public testing::TestWithParam<TreeSearchMethodArgs> {
@@ -15,7 +15,7 @@ class TestTreeSearchMethod : public testing::TestWithParam<TreeSearchMethodArgs>
 
         void SetUp() override {
             baseline = std::make_unique<LinearSearchMethod>(GetParam().inputData);
-            method = std::make_unique<TreeSearchMethod>(GetParam().inputData);
+            method = std::make_unique<TreeSearchMethod>(GetParam().inputData, GetParam().nThreads);
         }
 };
 

@@ -1,6 +1,4 @@
 #pragma once
-#define SKIP_DIwS_SHIT 1
-#ifndef SKIP_DIS_SHIT
 #include <unordered_map>
 #include <string>
 #include <optional>
@@ -9,8 +7,6 @@
 #include <thread>
 #include <mutex>
 #include <shared_mutex>
-#include <iostream>
-#include <cmath>
 #include <list>
 
 #include "utils.h"
@@ -52,4 +48,3 @@ class SearchTree {
 
         std::vector<std::string> find(const std::string &s, size_t nThreads);
 };
-#endif
