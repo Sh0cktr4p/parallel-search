@@ -12,6 +12,8 @@
 #include <iostream>
 #include <cmath>
 
+#include "utils.h"
+
 
 class SearchTreeNode {
     private:
@@ -34,8 +36,8 @@ class SearchTreeNode {
         // Otherwise, create a new node
         void addString(const std::string &s);
 
-        void getAllItems(std::vector<std::string>* results);
-        std::optional<std::vector<std::string>> find(const std::string &s);
+        void getAllItems(std::vector<std::string>* results, size_t nThreads);
+        std::optional<std::vector<std::string>> find(const std::string &s, size_t nThreads);
 };
 
 class SearchTree {
@@ -45,8 +47,8 @@ class SearchTree {
     public:
         SearchTree();
         void addString(const std::string &element);
-        void addElements(const std::vector<std::string> &elements);
+        void addElements(const std::vector<std::string> &elements, size_t nThreads);
 
-        std::vector<std::string> find(const std::string &s);
+        std::vector<std::string> find(const std::string &s, size_t nThreads);
 };
 #endif
