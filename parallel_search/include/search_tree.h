@@ -1,21 +1,29 @@
 #pragma once
-#define SKIPe_DIS_SHIT 1
+#define SKIP_DIwS_SHIT 1
 #ifndef SKIP_DIS_SHIT
 #include <unordered_map>
 #include <string>
 #include <optional>
 #include <vector>
 #include <memory>
+#include <thread>
+#include <mutex>
+#include <shared_mutex>
+#include <iostream>
 
 
 class SearchTreeNode {
     private:
-        size_t depth;
+        std::shared_mutex mutex;
+        const size_t depth;
         std::optional<std::string> item;
-        std::optional<std::unordered_map<char, std::unique_ptr<SearchTreeNode>>> character_map;
+        std::optional<std::unordered_map<char, std::unique_ptr<SearchTreeNode>>> characterMap;
 
-        SearchTreeNode* getChild(const std::string& s);
+        char getKeyChar(const std::string &s);
+        SearchTreeNode* getChild(char c);
         SearchTreeNode* getMatchingSubtree(const std::string& s);
+        void addLeaf(const std::string& s);
+        void toInnerNode();
     public:
         SearchTreeNode(size_t depth);
         SearchTreeNode(size_t depth, const std::string& item);

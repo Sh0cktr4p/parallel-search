@@ -1,27 +1,22 @@
 #include "search_tree.h"
 
 #ifndef SKIP_DIS_SHIT
-SearchTreeNode::SearchTreeNode(size_t depth): depth{depth}, item{}, character_map{} {}
 
-SearchTreeNode::SearchTreeNode(size_t depth, const std::string &item): depth{depth}, item{item}, character_map{} {}
-
-bool SearchTreeNode::isLeaf() {
-    // Inner node may also have items (if depth == length)
-    return !this->character_map.has_value();
+char SearchTreeNode::getKeyChar(const std::string &s) {
+    return s[this->depth];
 }
 
-SearchTreeNode *SearchTreeNode::getChild(const std::string &s) {
-    if (s.length() <= this->depth || !this->character_map.has_value()) {
+SearchTreeNode* SearchTreeNode::getChild(char c) {
+    if (this->isLeaf()) {
+        return nullptr;
+    }
+
+    auto search = this->characterMap.value().find(c);
+    if (search == this->characterMap.value().end()) {
         return nullptr;
     }
     else {
-        auto search = this->character_map.value().find(s[this->depth]);
-        if (search == this->character_map.value().end()) {
-            return nullptr;
-        }
-        else {
-            return search->second.get();
-        }
+        return search->second.get();
     }
 }
 
@@ -30,7 +25,7 @@ SearchTreeNode* SearchTreeNode::getMatchingSubtree(const std::string &s) {
         return this;
     }
     else {
-        SearchTreeNode* child = this->getChild(s);
+        SearchTreeNode* child = this->getChild(this->getKeyChar(s));
         if (child != nullptr) {
             return child->getMatchingSubtree(s);
         }
@@ -40,32 +35,58 @@ SearchTreeNode* SearchTreeNode::getMatchingSubtree(const std::string &s) {
     }
 }
 
-void SearchTreeNode::addString(const std::string &s) {
-    if (this->item.has_value() && this->item.value() == s) {
-        // Do nothing when storing an already stored string
+void SearchTreeNode::addLeaf(const std::string& s) {
+    this->characterMap.value().emplace(this->getKeyChar(s), std::make_unique<SearchTreeNode>(this->depth + 1, s));
+}
+
+void SearchTreeNode::toInnerNode() {
+    if (!this->isLeaf()) {
         return;
     }
 
-    if (this->isLeaf()) {
-        // Initialize the character map, store current item (transform from leaf to inner node)
-        this->character_map = std::unordered_map<char, std::unique_ptr<SearchTreeNode>>();
+    this->characterMap.emplace();
 
-        if (this->item.has_value() && this->item.value().length() > this->depth) {
-            this->character_map.value()[this->item.value()[this->depth]] = std::make_unique<SearchTreeNode>(this->depth + 1, this->item.value());
-            this->item.reset();
-        }
+    if (this->item.has_value() && this->item.value().length() > this->depth) {
+        this->addLeaf(this->item.value());
+        this->item.reset();
+    }
+}
+
+
+
+SearchTreeNode::SearchTreeNode(size_t depth): depth{depth} {}
+
+SearchTreeNode::SearchTreeNode(size_t depth, const std::string &item): depth{depth}, item{item} {}
+
+
+bool SearchTreeNode::isLeaf() {
+    // Inner node may also have items (if depth == length)
+    return !this->characterMap.has_value();
+}
+
+void SearchTreeNode::addString(const std::string &s) {
+    if (this->item == s) {
+        // Do not expand if the element is already in the tree
+        return;
     }
 
     if (s.length() == this->depth) {
+        // Transform the node to an inner node and replace the item
+        // If already an inner node, toInnerNode does nothing
+        this->toInnerNode();
         this->item = s;
     }
     else {
-        SearchTreeNode* child_node = this->getChild(s);
-        if (child_node == nullptr) {
-            this->character_map.value()[s[this->depth]] = std::make_unique<SearchTreeNode>(this->depth + 1, s);
+        if (this->isLeaf()) {
+            this->toInnerNode();
+        }
+        SearchTreeNode* childNode = this->getChild(this->getKeyChar(s));
+        if (childNode == nullptr) {
+            // Child was not found (it is possible that the node is a leaf)
+            this->addLeaf(s);
         }
         else {
-            child_node->addString(s);
+            return childNode->addString(s);
         }
     }
 }
@@ -75,8 +96,8 @@ std::vector<std::string> SearchTreeNode::getAllItems() {
     if (this->item.has_value()) {
         result.push_back(this->item.value());
     }
-    if (this->character_map.has_value()) {
-        for (auto &[key, childNode] : this->character_map.value()) {
+    if (this->characterMap.has_value()) {
+        for (auto &[key, childNode] : this->characterMap.value()) {
             std::vector<std::string> childItems = childNode->getAllItems();
             result.reserve(result.size() + childItems.size());
             result.insert(result.end(), childItems.begin(), childItems.end());
@@ -96,6 +117,9 @@ std::optional<std::vector<std::string>> SearchTreeNode::find(const std::string &
         return subtree->getAllItems();
     }
 }
+
+
+
 
 SearchTree::SearchTree(): root(0) {}
 
