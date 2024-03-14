@@ -11,6 +11,7 @@
 #include <shared_mutex>
 #include <iostream>
 #include <cmath>
+#include <list>
 
 #include "utils.h"
 
@@ -36,7 +37,7 @@ class SearchTreeNode {
         // Otherwise, create a new node
         void addString(const std::string &s);
 
-        void getAllItems(std::vector<std::string>* results, size_t nThreads);
+        void getAllItems(std::list<std::string>* results, size_t nThreads);
         std::optional<std::vector<std::string>> find(const std::string &s, size_t nThreads);
 };
 

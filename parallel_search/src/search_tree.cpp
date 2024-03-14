@@ -103,7 +103,7 @@ void SearchTreeNode::addString(const std::string &s) {
     childNode->addString(s);
 }
 
-void SearchTreeNode::getAllItems(std::vector<std::string>* results, size_t nThreads) {
+void SearchTreeNode::getAllItems(std::list<std::string>* results, size_t nThreads) {
     std::vector<SearchTreeNode*> children;
     {
         std::shared_lock lock(this->mutex);
@@ -122,28 +122,29 @@ void SearchTreeNode::getAllItems(std::vector<std::string>* results, size_t nThre
 
     if (children.size() > 0) {
         std::vector<std::thread> threadPool;
-        std::vector<std::vector<std::string>> resultsPerThread(childNThreads.size());
+        std::list<std::list<std::string>> resultsPerThread(childNThreads.size());
 
-        auto fn = [&children, &resultsPerThread](size_t threadIndex, size_t startChildIdx, size_t endChildIdx, size_t nChildThreads) {
-            std::vector<std::vector<std::string>> resultsPerChildInThread(endChildIdx - startChildIdx);
+        auto fn = [&children](std::list<std::string>* resultsOfMyThread, size_t startChildIdx, size_t endChildIdx, size_t nChildThreads) {
             for (size_t childIndex = startChildIdx; childIndex < endChildIdx; childIndex++) {
+                std::list<std::string> resultsOfChild;
                 children[childIndex]->getAllItems(
-                    &resultsPerChildInThread[childIndex - startChildIdx],
+                    &resultsOfChild,
                     nChildThreads
                 );
-
-                insertVectors(resultsPerThread[threadIndex], resultsPerChildInThread);
+                childIndex++;
+                resultsOfMyThread->splice(resultsOfMyThread->end(), resultsOfChild);
             }
         };
 
-        for (size_t threadIndex = 0; threadIndex < childNThreads.size(); threadIndex++) {
+        size_t threadIndex{0};
+        for (std::list<std::string> &resultsOfThread : resultsPerThread) {
             size_t startChildIdx = getStartIndex(children.size(), childNThreads.size(), threadIndex);
             size_t endChildIdx = getEndIndex(children.size(), childNThreads.size(), threadIndex);
 
             if (threadIndex < childNThreads.size() - 1 && false) {
                 threadPool.emplace_back(
                     fn,
-                    threadIndex,
+                    &resultsOfThread,
                     startChildIdx,
                     endChildIdx,
                     childNThreads[threadIndex]
@@ -152,7 +153,7 @@ void SearchTreeNode::getAllItems(std::vector<std::string>* results, size_t nThre
             else {
                 // Perform work on main thread
                 fn(
-                    threadIndex,
+                    &resultsOfThread,
                     startChildIdx,
                     endChildIdx,
                     childNThreads[threadIndex]
@@ -164,7 +165,9 @@ void SearchTreeNode::getAllItems(std::vector<std::string>* results, size_t nThre
             thread.join();
         }
 
-        insertVectors(*results, resultsPerThread);
+        for (std::list<std::string> &resultOfThread : resultsPerThread) {
+            results->splice(results->end(), resultOfThread);
+        }
     }
 }
 
@@ -175,9 +178,10 @@ std::optional<std::vector<std::string>> SearchTreeNode::find(const std::string &
         return std::nullopt;
     }
     else {
-        std::vector<std::string> results;
+        std::list<std::string> results;
         subtree->getAllItems(&results, nThreads);
-        return results;
+
+        return std::vector<std::string>{results.begin(), results.end()};
     }
 }
 
