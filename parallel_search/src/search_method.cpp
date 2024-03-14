@@ -27,7 +27,7 @@ void ParallelLinearSearchMethod::searchRange(
     size_t end
 ) {
     for (size_t i = begin; i < end; i++) {
-        if (data[i].length() >= keyword.length() && data[i].rfind(keyword, 0) == 0) {
+        if (matchPrefix(data[i], keyword)) {
             results->push_back(data[i]);
         }
     }
@@ -40,16 +40,33 @@ std::vector<std::string> ParallelLinearSearchMethod::search(const std::string &k
     std::vector<std::thread> threadPool;
     std::vector<std::vector<std::string>> results(realNThreads);
 
+    auto threadFn = [this, keyword](std::vector<std::string>* resultsOfThread, size_t beginIndex, size_t endIndex) {
+        for (size_t i = beginIndex; i < endIndex; i++) {
+            if (matchPrefix(this->data[i], keyword)) {
+                resultsOfThread->push_back(data[i]);
+            }
+        }
+    };
+
     for (size_t i = 0; i < realNThreads; i++) {
         size_t startIndex = getStartIndex(this->data.size(), realNThreads, i);
         size_t endIndex = getEndIndex(this->data.size(), realNThreads, i);
 
         if (i < realNThreads - 1) {
-            threadPool.emplace_back(&ParallelLinearSearchMethod::searchRange, this, &results[i], keyword, startIndex, endIndex);
+            threadPool.emplace_back(
+                threadFn,
+                &results[i],
+                startIndex,
+                endIndex
+            );
         }
         else {
             // Also perform work on the main thread
-            this->searchRange(&results[i], keyword, startIndex, endIndex);
+            threadFn(
+                &results[i],
+                startIndex,
+                endIndex
+            );
         }
     }
 
@@ -58,9 +75,7 @@ std::vector<std::string> ParallelLinearSearchMethod::search(const std::string &k
     }
 
     std::vector<std::string> flattenedResults;
-    for (std::vector<std::string> &v : results) {
-        flattenedResults.insert(flattenedResults.end(), v.begin(), v.end());
-    }
+    insertVectors(flattenedResults, results);
 
     return flattenedResults;
 }
