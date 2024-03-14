@@ -40,7 +40,7 @@ SearchTreeNode* SearchTreeNode::getMatchingSubtree(const std::string &s) {
 }
 
 void SearchTreeNode::addLeaf(const std::string& s) {
-    this->characterMap.value().emplace(this->getKeyChar(s), std::make_unique<SearchTreeNode>(this->depth + 1, s));
+    this->characterMap.value().emplace(this->getKeyChar(s), std::make_shared<SearchTreeNode>(this->depth + 1, s));
 }
 
 void SearchTreeNode::toInnerNode() {
@@ -119,10 +119,12 @@ void SearchTreeNode::getAllItems(std::vector<std::string>* results) {
 
     if (children.size() > 0) {
         std::vector<std::thread> threadPool;
-        std::vector<std::vector<std::string>> childResults;
-        childResults.reserve(children.size());  // Prevent reallocation
+        std::vector<std::vector<std::string>> childResults(children.size());
 
         for (size_t i = 1; i < children.size(); i++) {
+            // childResults.emplace_back();
+            children[i]->getAllItems(&childResults[i]);
+            
             threadPool.emplace_back(
                 &SearchTreeNode::getAllItems,
                 children[i],
@@ -130,8 +132,10 @@ void SearchTreeNode::getAllItems(std::vector<std::string>* results) {
             );
         }
 
+       // childResults.emplace_back();
+        children[0]->getAllItems(&childResults[0]);
+
         // Perform work on main thread
-        children[0]->getAllItems(&results[0]);
 
         for (std::thread& thread : threadPool) {
             thread.join();
@@ -165,7 +169,6 @@ std::optional<std::vector<std::string>> SearchTreeNode::find(const std::string &
 
 
 
-
 SearchTree::SearchTree(): root(0) {}
 
 void SearchTree::addString(const std::string &element) {
@@ -173,8 +176,32 @@ void SearchTree::addString(const std::string &element) {
 }
 
 void SearchTree::addElements(const std::vector<std::string> &elements) {
-    for (const std::string &element : elements) {
-        this->addString(element);
+    size_t maxNThreads{10};
+
+    const size_t realNThreads = std::min(maxNThreads, elements.size());
+
+    std::vector<std::thread> threadPool;
+
+    auto threadFn = [this, &elements] (size_t startDiff, size_t endDiff) {
+        for (size_t i = startDiff; i < endDiff; i++) {
+            this->addString(elements[i]);
+        }
+    };
+
+    for (size_t i = 0; i < realNThreads; i++) {
+        size_t startDiff = std::round(i * elements.size() * 1.0 / realNThreads);
+        size_t endDiff = std::round((i + 1) * elements.size() * 1.0 / realNThreads);
+        
+        if (i < realNThreads - 1) {
+            threadPool.emplace_back(threadFn, startDiff, endDiff);
+        }
+        else {
+            threadFn(startDiff, endDiff);
+        }
+    }
+
+    for (std::thread& thread : threadPool) {
+        thread.join();
     }
 }
 

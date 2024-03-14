@@ -10,6 +10,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <iostream>
+#include <cmath>
 
 
 class SearchTreeNode {
@@ -17,7 +18,7 @@ class SearchTreeNode {
         std::shared_mutex mutex;
         const size_t depth;
         std::optional<std::string> item;
-        std::optional<std::unordered_map<char, std::unique_ptr<SearchTreeNode>>> characterMap;
+        std::optional<std::unordered_map<char, std::shared_ptr<SearchTreeNode>>> characterMap;
 
         char getKeyChar(const std::string &s);
         SearchTreeNode* getChild(char c);
@@ -40,7 +41,7 @@ class SearchTreeNode {
 class SearchTree {
     private:
         SearchTreeNode root;
-    
+
     public:
         SearchTree();
         void addString(const std::string &element);
