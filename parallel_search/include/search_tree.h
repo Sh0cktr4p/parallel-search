@@ -33,7 +33,7 @@ class SearchTreeNode {
         // Otherwise, create a new node
         void addString(const std::string &s);
 
-        std::vector<std::string> getAllItems();
+        void getAllItems(std::vector<std::string>* results);
         std::optional<std::vector<std::string>> find(const std::string &s);
 };
 
