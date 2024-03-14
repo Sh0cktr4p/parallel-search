@@ -18,6 +18,7 @@ class SearchAlgorithm {
     public:
         SearchAlgorithm(const std::vector<std::string>& data);
 
+        virtual void processData() = 0;
         virtual std::vector<std::string> search(const std::string &keyword) = 0;
 };
 
@@ -29,6 +30,7 @@ class ParallelLinearSearchAlgorithm: public SearchAlgorithm {
     public:
         ParallelLinearSearchAlgorithm(const std::vector<std::string>& data, size_t nThreads);
 
+        void processData() override;
         std::vector<std::string> search(const std::string &keyword) override;
 };
 
@@ -41,5 +43,6 @@ class TreeSearchAlgorithm: public SearchAlgorithm {
     public:
         TreeSearchAlgorithm(const std::vector<std::string>& data, size_t nThreads);
 
+        void processData() override;
         std::vector<std::string> search(const std::string &keyword) override;
 };

@@ -5,6 +5,8 @@ SearchAlgorithm::SearchAlgorithm(const std::vector<std::string>& data): data{dat
 
 ParallelLinearSearchAlgorithm::ParallelLinearSearchAlgorithm(const std::vector<std::string>& data, size_t nThreads): SearchAlgorithm(data), nThreads{nThreads} {}
 
+void ParallelLinearSearchAlgorithm::processData() {}
+
 std::vector<std::string> ParallelLinearSearchAlgorithm::search(const std::string &keyword) {
     // Do not create more threads than elements in the vector
     const size_t realNThreads = std::min(this->nThreads, this->data.size());
@@ -52,7 +54,9 @@ std::vector<std::string> ParallelLinearSearchAlgorithm::search(const std::string
     return flattenedResults;
 }
 
-TreeSearchAlgorithm::TreeSearchAlgorithm(const std::vector<std::string>& data, size_t nThreads): SearchAlgorithm(data), tree(), nThreads{nThreads} {
+TreeSearchAlgorithm::TreeSearchAlgorithm(const std::vector<std::string>& data, size_t nThreads): SearchAlgorithm(data), tree(), nThreads{nThreads} {}
+
+void TreeSearchAlgorithm::processData() {
     this->tree.addElements(this->data, this->nThreads);
 }
 

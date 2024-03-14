@@ -5,6 +5,8 @@
 
 int pow(int base, unsigned int exponent);
 
+std::string getRandomString(unsigned int length, const std::string& charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
 // Vector of all permutations of strings with length <length>
 std::vector<std::string> getFixedSizeExampleInput(
     unsigned int length,

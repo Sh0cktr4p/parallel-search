@@ -13,8 +13,8 @@ int pow(int b, unsigned int e) {
 
 std::string getStringFromIndex(
     unsigned int index,
-    std::vector<unsigned int> &powers,
-    std::string& charSet
+    const std::vector<unsigned int> &powers,
+    const std::string& charSet
 ) {
     std::string s{};
     s.reserve(powers.size());
@@ -29,7 +29,7 @@ std::string getStringFromIndex(
 
 std::string getRandomString(
     unsigned int length,
-    std::string& charSet
+    const std::string& charSet
 ) {
     std::string s(length, 0);
 
