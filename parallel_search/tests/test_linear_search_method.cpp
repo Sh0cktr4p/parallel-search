@@ -3,34 +3,35 @@
 #include "search_method.h"
 
 
-struct LinearSearchMethodArgs {
+struct LinearSearchAlgorithmArgs {
     std::vector<std::string> inputData;
+    size_t nThreads = 1;
 };
 
 
-class TestLinearSearchMethod : public testing::TestWithParam<LinearSearchMethodArgs> {
+class TestLinearSearchAlgorithm : public testing::TestWithParam<LinearSearchAlgorithmArgs> {
     protected:
-        std::unique_ptr<LinearSearchMethod> method;
+        std::unique_ptr<ParallelLinearSearchAlgorithm> algorithm;
 
         void SetUp() override {
-            method = std::make_unique<LinearSearchMethod>(GetParam().inputData);
+            algorithm = std::make_unique<ParallelLinearSearchAlgorithm>(GetParam().inputData, GetParam().nThreads);
         }
 };
 
-TEST_P(TestLinearSearchMethod, FindSingleInputElement) {
+TEST_P(TestLinearSearchAlgorithm, FindSingleInputElement) {
     if (GetParam().inputData.size() == 0) {
         GTEST_SKIP() << "Cannot find anything in empty input data";
     }
-    std::vector<std::string> result = method->search(GetParam().inputData[0]);
+    std::vector<std::string> result = algorithm->search(GetParam().inputData[0]);
     ASSERT_EQ(result.size(), 1);
     ASSERT_EQ(result[0], GetParam().inputData[0]);
 }
 
-TEST_P(TestLinearSearchMethod, FindEmptyString) {
+TEST_P(TestLinearSearchAlgorithm, FindEmptyString) {
     if (GetParam().inputData.size() == 0) {
         GTEST_SKIP() << "Cannot find anything in empty input data";
     }
-    std::vector<std::string> result = method->search("");
+    std::vector<std::string> result = algorithm->search("");
     ASSERT_EQ(result.size(), GetParam().inputData.size());
     std::set<std::string> inputDataSet(GetParam().inputData.begin(), GetParam().inputData.end());
     std::set<std::string> outputDataSet(result.begin(), result.end());
@@ -38,7 +39,7 @@ TEST_P(TestLinearSearchMethod, FindEmptyString) {
     ASSERT_EQ(inputDataSet, outputDataSet);
 }
 
-TEST_P(TestLinearSearchMethod, FindSubstring) {
+TEST_P(TestLinearSearchAlgorithm, FindSubstring) {
     if (GetParam().inputData.size() == 0) {
         GTEST_SKIP() << "Cannot find anything in empty input data";
     }
@@ -56,31 +57,31 @@ TEST_P(TestLinearSearchMethod, FindSubstring) {
         GTEST_SKIP() << "No element with length > 1 found";
     }
     std::string substr = element.substr(0, element.length() - 1);
-    ASSERT_GE(method->search(substr).size(), 1);
+    ASSERT_GE(algorithm->search(substr).size(), 1);
 }
 
-TEST_P(TestLinearSearchMethod, SearchSuperstring) {
+TEST_P(TestLinearSearchAlgorithm, SearchSuperstring) {
     if (GetParam().inputData.size() == 0) {
         GTEST_SKIP() << "Cannot find anything in empty input data";
     }
 
     std::string superstr = GetParam().inputData[0] + "A";
-    ASSERT_EQ(method->search(superstr).size(), 0);
+    ASSERT_EQ(algorithm->search(superstr).size(), 0);
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    LinearSearchMethodTests,
-    TestLinearSearchMethod,
+    LinearSearchAlgorithmTests,
+    TestLinearSearchAlgorithm,
     testing::Values(
-        LinearSearchMethodArgs{getFixedSizeExampleInput(0)},
-        LinearSearchMethodArgs{getFixedSizeExampleInput(4)},
-        LinearSearchMethodArgs{getRandomLengthExampleInput(100, 2, 10)}
+        LinearSearchAlgorithmArgs{getFixedSizeExampleInput(0)},
+        LinearSearchAlgorithmArgs{getFixedSizeExampleInput(4)},
+        LinearSearchAlgorithmArgs{getRandomLengthExampleInput(100, 2, 10)}
     )
 );
 
-TEST(LinearSearchMethodTests, TestOnFixedSizeInput) {
+TEST(LinearSearchAlgorithmTests, TestOnFixedSizeInput) {
     std::vector<std::string> data = getFixedSizeExampleInput(4);
-    LinearSearchMethod s(data);
+    ParallelLinearSearchAlgorithm s(data, 1);
 
     ASSERT_EQ(s.search("ABBA").size(), 1);
     ASSERT_EQ(s.search("ABBA")[0], "ABBA");
