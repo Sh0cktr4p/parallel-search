@@ -157,6 +157,7 @@ void SearchTreeNode::getAllItems(std::list<std::string>* results, size_t nThread
                     childNThreads[threadIndex]
                 );
             }
+            threadIndex++;
         }
 
         for (std::thread& thread : threadPool) {
