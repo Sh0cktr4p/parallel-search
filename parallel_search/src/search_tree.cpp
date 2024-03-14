@@ -131,7 +131,7 @@ void SearchTreeNode::getAllItems(std::list<std::string>* results, size_t nThread
                     &resultsOfChild,
                     nChildThreads
                 );
-                childIndex++;
+
                 resultsOfMyThread->splice(resultsOfMyThread->end(), resultsOfChild);
             }
         };
