@@ -139,7 +139,7 @@ void SearchTreeNode::getAllItems(std::list<std::string>* results, size_t nThread
             size_t startChildIdx = getStartIndex(children.size(), childNThreads.size(), threadIndex);
             size_t endChildIdx = getEndIndex(children.size(), childNThreads.size(), threadIndex);
 
-            if (threadIndex < childNThreads.size() - 1 && false) {
+            if (threadIndex < childNThreads.size() - 1) {
                 threadPool.emplace_back(
                     fn,
                     &resultsOfThread,
