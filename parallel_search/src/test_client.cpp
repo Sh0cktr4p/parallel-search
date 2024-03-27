@@ -69,8 +69,8 @@ void compareBothAlgorithms(size_t nThreads, size_t nQueries, std::vector<std::st
     for (auto& query : compQueries) {
         auto linRes = lin.search(query);
         auto trRes = tr.search(query);
-        std::cout << "Linear Search:" << lin.search(query) << std::endl;
-        std::cout << "Tree Search:" << tr.search(query) << std::endl;
+        //std::cout << "Linear Search:" << lin.search(query) << std::endl;
+        //std::cout << "Tree Search:" << tr.search(query) << std::endl;
         std::set<std::string> linSet{linRes.begin(), linRes.end()};
         std::set<std::string> trSet{trRes.begin(), trRes.end()};
         std::set<std::string> diff;
@@ -139,12 +139,27 @@ void runTestClient() {
 
 void useTreeSearch() {
     auto data = getFixedSizeExampleInput(4);
-    auto tr = TreeSearchAlgorithm(data, 8);
+    auto tr = TreeSearchAlgorithm(data, 1);
+    auto startTreeGen = std::chrono::system_clock::now();
     tr.processData();
+    auto endTreeGen = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> treeGenDuration = endTreeGen - startTreeGen;
+    std::cout << "Building the tree took " << treeGenDuration.count() << "s" << std::endl;
 
     while (true) {
+        std::cout << "Please input an all-capital string" << std::endl;
         std::string input;
         std::cin >> input;
-        std::cout << tr.search(input) << std::endl;
+
+        if(input == "<empty>") {
+            input = "";
+        }
+        auto startSearch = std::chrono::system_clock::now();
+        auto matches = tr.search(input);
+        auto endSearch = std::chrono::system_clock::now();
+        std::chrono::duration<double> searchDuration = endSearch - startSearch;
+        std::cout << matches << std::endl;
+        std::cout << "Searching took " << searchDuration.count() << "s" << std::endl;
     }
 }

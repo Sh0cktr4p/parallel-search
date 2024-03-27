@@ -115,10 +115,10 @@ void SearchTreeNode::getAllItems(std::list<std::string>* results, size_t nThread
         }
     }
 
-    // How many threads to run at this level and how many to create at each child
-    const std::vector<size_t> childNThreads = getDistributedThreadCounts(nThreads, children.size());
-
     if (children.size() > 0) {
+        // How many threads to run at this level and how many to create at each child
+        const std::vector<size_t> childNThreads = getDistributedThreadCounts(nThreads, children.size());
+
         std::vector<std::thread> threadPool;
         std::list<std::list<std::string>> resultsPerThread(childNThreads.size());
 
@@ -138,8 +138,7 @@ void SearchTreeNode::getAllItems(std::list<std::string>* results, size_t nThread
         for (std::list<std::string> &resultsOfThread : resultsPerThread) {
             size_t startChildIdx = getStartIndex(children.size(), childNThreads.size(), threadIndex);
             size_t endChildIdx = getEndIndex(children.size(), childNThreads.size(), threadIndex);
-
-            if (threadIndex < childNThreads.size() - 1 && false) {
+            if (threadIndex < childNThreads.size() - 1) {
                 threadPool.emplace_back(
                     fn,
                     &resultsOfThread,
@@ -179,8 +178,8 @@ std::optional<std::vector<std::string>> SearchTreeNode::find(const std::string &
     else {
         std::list<std::string> results;
         subtree->getAllItems(&results, nThreads);
-
-        return std::vector<std::string>{results.begin(), results.end()};
+        std::vector<std::string> vr{results.begin(), results.end()};
+        return vr;
     }
 }
 
